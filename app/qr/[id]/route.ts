@@ -7,11 +7,11 @@ const fallback: Record<string, { webapp: string; spotify?: string; youtube?: str
   }
 };
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id;
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
   const ua = (req.headers.get("user-agent") ?? "").toLowerCase();
 
-  const fromEnv = process.env.TARGETS_JSON ? JSON.parse(process.env.TARGETS_JSON) : {};
+  const fromEnv: any = process.env.TARGETS_JSON ? JSON.parse(process.env.TARGETS_JSON) : {};
   const t = fromEnv[id] ?? fallback[id];
   if (!t) return NextResponse.json({ error: "QR not found" }, { status: 404 });
 
