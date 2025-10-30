@@ -8,8 +8,8 @@ const COPY: Record<string, any> = {
   }
 };
 
-export async function GET(request: NextRequest, context: { params: Promise<{ musicId: string }> }) {
-  const { musicId } = await context.params;
+export async function GET(request: NextRequest, context: any) {
+  const { musicId } = await context.params as any;
   const lang = (new URL(request.url).searchParams.get("lang") ?? "en").slice(0,2);
   const node = COPY[musicId];
   if (!node) return NextResponse.json({ error: "Not found" }, { status: 404 });

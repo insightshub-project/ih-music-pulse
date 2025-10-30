@@ -7,8 +7,8 @@ const fallback: Record<string, { webapp: string; spotify?: string; youtube?: str
   }
 };
 
-export async function GET(request: NextRequest, context: { params: Promise<{ musicId: string }> }) {
-  const { musicId } = await context.params;
+export async function GET(request: NextRequest, context: any) {
+  const { musicId } = await context.params as any;
   const ua = (request.headers.get("user-agent") ?? "").toLowerCase();
 
   const fromEnv = process.env.TARGETS_JSON ? JSON.parse(process.env.TARGETS_JSON) : {};
