@@ -13,20 +13,21 @@ const COPY = {
       links: { spotify: "https://open.spotify.com/playlist/4abc123" }
     }
   }
-};
+} as const;
 
-type LangKey = keyof typeof COPY["music001"];
+type PosterKey = keyof typeof COPY;                         // "music001"
+type PosterLang<K extends PosterKey> = keyof typeof COPY[K]; // "sv" | "en"
 
 export async function GET(request: NextRequest, context: any) {
-  const { musicId } = await context.params as any;
-  const key = musicId as keyof typeof COPY;
+  const { musicId } = (await context.params) as { musicId: string };
+  const key = musicId as PosterKey;
 
-  let lang = (new URL(request.url).searchParams.get("lang") ?? "en").slice(0, 2);
-  if (!["sv", "en"].includes(lang)) lang = "en";
-
+  let lang = (new URL(request.url).searchParams.get("lang") ?? "en").slice(0,2) as string;
   const node = COPY[key];
   if (!node) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const data = node[lang as LangKey];
+  const hasLang = (lang in node) ? (lang as PosterLang<typeof key>) : ("en" as PosterLang<typeof key>);
+  const data = node[hasLang];
+
   return NextResponse.json({ id: key, ...data });
 }
