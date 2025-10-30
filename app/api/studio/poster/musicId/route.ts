@@ -8,11 +8,11 @@ const COPY: Record<string, any> = {
   }
 };
 
-export async function GET(req: NextRequest, { params }: { params: { musicId: string } }) {
-  const id = params.musicId;
-  const lang = (new URL(req.url).searchParams.get("lang") ?? "en").slice(0,2);
-  const node = COPY[id];
+export async function GET(request: NextRequest, context: { params: Promise<{ musicId: string }> }) {
+  const { musicId } = await context.params;
+  const lang = (new URL(request.url).searchParams.get("lang") ?? "en").slice(0,2);
+  const node = COPY[musicId];
   if (!node) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const data = node[lang] ?? node["en"];
-  return NextResponse.json({ id, ...data });
+  return NextResponse.json({ id: musicId, ...data });
 }

@@ -7,17 +7,17 @@ const fallback: Record<string, { webapp: string; spotify?: string; youtube?: str
   }
 };
 
-export async function GET(req: NextRequest, { params }: { params: { musicId: string } }) {
-  const id = params.musicId;
-  const ua = (req.headers.get("user-agent") ?? "").toLowerCase();
+export async function GET(request: NextRequest, context: { params: Promise<{ musicId: string }> }) {
+  const { musicId } = await context.params;
+  const ua = (request.headers.get("user-agent") ?? "").toLowerCase();
 
   const fromEnv = process.env.TARGETS_JSON ? JSON.parse(process.env.TARGETS_JSON) : {};
-  const t = fromEnv[id] ?? fallback[id];
+  const t = fromEnv[musicId] ?? fallback[musicId];
   if (!t) return NextResponse.json({ error: "QR not found" }, { status: 404 });
 
   const isIGorIOS = ua.includes("instagram") || ua.includes("iphone");
   const target = isIGorIOS ? t.webapp : (t.spotify ?? t.webapp);
 
-  console.log(JSON.stringify({ ts: new Date().toISOString(), event: "qr.scan", id, ua }));
-  return NextResponse.redirect(new URL(target, req.url), 302);
+  console.log(JSON.stringify({ ts: new Date().toISOString(), event: "qr.scan", id: musicId, ua }));
+  return NextResponse.redirect(new URL(target, request.url), 302);
 }
