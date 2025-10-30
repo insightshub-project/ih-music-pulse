@@ -7,7 +7,7 @@ const fallback = {
   }
 };
 
-type QRKey = keyof typeof fallback; // 'music001'
+type QRKey = keyof typeof fallback;
 
 export async function GET(request: NextRequest, context: any) {
   const { musicId } = await context.params as any;

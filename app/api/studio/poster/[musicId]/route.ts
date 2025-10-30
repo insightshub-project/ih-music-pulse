@@ -15,18 +15,18 @@ const COPY = {
   }
 };
 
-type LangKey = keyof typeof COPY["music001"]; // 'sv' | 'en'
+type LangKey = keyof typeof COPY["music001"];
 
 export async function GET(request: NextRequest, context: any) {
   const { musicId } = await context.params as any;
   const key = musicId as keyof typeof COPY;
 
   let lang = (new URL(request.url).searchParams.get("lang") ?? "en").slice(0, 2);
-  if (!["sv", "en"].includes(lang)) lang = "en"; // type guard
+  if (!["sv", "en"].includes(lang)) lang = "en";
 
   const node = COPY[key];
   if (!node) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const data = node[lang as LangKey]; // tell TS it's safe
+  const data = node[lang as LangKey];
   return NextResponse.json({ id: key, ...data });
 }
